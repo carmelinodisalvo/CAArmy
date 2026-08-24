@@ -520,35 +520,6 @@
       line-height: 1.7;
       margin-bottom: 10px;
     }
-    .install-modal .install-steps {
-      list-style: none;
-      counter-reset: passo;
-    }
-    .install-modal .install-steps li {
-      counter-increment: passo;
-      font-size: 14px;
-      color: var(--ink);
-      line-height: 1.6;
-      padding: 8px 0 8px 34px;
-      position: relative;
-      border-bottom: 1px solid var(--border);
-    }
-    .install-modal .install-steps li::before {
-      content: counter(passo);
-      position: absolute;
-      left: 0;
-      top: 6px;
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: var(--blue);
-      color: #fff;
-      font-size: 12px;
-      font-weight: 800;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
 
     /* ---------- Drawer menu ---------- */
     .overlay {
@@ -656,43 +627,11 @@
       min-height: 200px;
     }
 
-    .panel-empty { text-align: center; color: #94a3b8; font-size: 14px; padding: 40px 10px; }
-
-    .history-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      background: #ffffff;
-      border: 2px solid var(--border);
-      border-radius: 12px;
-      padding: 12px 14px;
-      margin-bottom: 10px;
-    }
-    .history-text { font-weight: 600; font-size: 14px; color: var(--ink-strong); }
-    .history-actions { display: flex; gap: 8px; flex-shrink: 0; }
-    .history-btn {
-      border: none;
-      background: var(--border);
-      border-radius: 8px;
-      width: 30px;
-      height: 30px;
-      cursor: pointer;
-    }
-
     .help-block { margin-bottom: 16px; }
     .help-block h3 { font-family: 'Baloo 2', sans-serif; font-size: 16px; color: var(--navy); margin-bottom: 6px; }
     .help-block p { font-size: 14px; color: var(--ink); line-height: 1.6; }
 
     .voice-picker { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-    .voice-picker select {
-      flex: 1;
-      min-width: 160px;
-      padding: 10px 12px;
-      font-size: 13px;
-      border: 2px solid var(--border-strong);
-      border-radius: 10px;
-    }
 
     .info-logo-row { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
     .info-logo-row img { width: 56px; height: 56px; border-radius: 50%; border: 2px solid var(--ink-strong); }
@@ -829,13 +768,6 @@
           <h3>Come si usa CAArmy</h3>
           <p>Scrivi una frase nella casella di testo, poi premi "Genera Simboli in CAA".</p>
         </div>
-        <div class="help-block">
-          <h3>Voce di lettura</h3>
-          <div class="voice-picker">
-            <select id="selettoreVoce"></select>
-            <button type="button" class="btn-secondary" id="btnProvaVoce">🔊 Prova voce</button>
-          </div>
-        </div>
       </div>
     </section>
 
@@ -884,10 +816,6 @@
   </div>
 
   <script>
-    // ---------- CONFIGURAZIONE BACKEND APPS SCRIPT ----------
-    // SOSTITUISCI IL LINK QUI SOTTO CON IL TUO LINK DELLA WEB APP PUBBLICATA SU GOOGLE APPS SCRIPT
-    var APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyeKzlGQtDrsDvcTyIMjA7iEg9XCgSwiP2soML9CNXkUXsWMs1qvSEZyAvmPZSli6QB4Q/exec";
-
     // Registrazione Service Worker per PWA
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', function() {
@@ -897,9 +825,7 @@
       });
     }
 
-    var VIEW_TITLES = { home: '', storico: 'Storico frasi', aiuto: 'Aiuto', info: 'Info', canali: 'Canali ufficiali' };
     var STORAGE_KEY = 'caarmy_storico';
-
     var altOverlay = document.getElementById('altOverlay');
     var altGrid = document.getElementById('altGrid');
     var altModalTitle = document.getElementById('altModalTitle');
@@ -909,7 +835,9 @@
       altGrid.innerHTML = '<div class="alt-modal-empty">Cerco le alternative...</div>';
       altOverlay.classList.add('open');
 
-      fetch(APPS_SCRIPT_URL + '?action=cercaSimboliAlternativi&parola=' + encodeURIComponent(parolaCercata))
+      var urlSearch = 'https://api.arasaac.org/v1/pictograms/it/search/' + encodeURIComponent(parolaCercata);
+
+      fetch(urlSearch)
         .then(function(res) { return res.json(); })
         .then(function(risultati) {
           if (!risultati || risultati.length === 0) {
@@ -917,19 +845,20 @@
             return;
           }
           altGrid.innerHTML = '';
-          risultati.forEach(function(simbolo) {
+          risultati.slice(0, 9).forEach(function(simbolo) {
             var opzione = document.createElement('button');
             opzione.type = 'button';
             opzione.className = 'alt-option';
             var img = document.createElement('img');
-            img.src = simbolo.url;
+            var imgUrl = 'https://static.arasaac.org/pictograms/' + simbolo._id + '/' + simbolo._id + '_300.png';
+            img.src = imgUrl;
             img.alt = headerTarget.innerText || parolaCercata;
             opzione.appendChild(img);
 
             opzione.addEventListener('click', function() {
               contenutoTarget.innerHTML = '';
               var nuovaImg = document.createElement('img');
-              nuovaImg.src = simbolo.url;
+              nuovaImg.src = imgUrl;
               nuovaImg.alt = headerTarget.innerText || parolaCercata;
               contenutoTarget.appendChild(nuovaImg);
               chiudiAlternative();
@@ -945,7 +874,6 @@
     function chiudiAlternative() { altOverlay.classList.remove('open'); }
     document.getElementById('altModalClose').addEventListener('click', chiudiAlternative);
 
-    // Installa PWA
     var installOverlay = document.getElementById('installOverlay');
     var installBody = document.getElementById('installBody');
     var deferredInstallPrompt = null;
@@ -967,7 +895,7 @@
         });
         return;
       }
-      installBody.innerHTML = '<p>Apri il menu del browser (tre puntini o icona condivisione) e seleziona "Aggiungi a schermata Home" o "Installa app".</p>';
+      installBody.innerHTML = '<p>Apri il menu del browser e seleziona "Aggiungi a schermata Home" o "Installa app".</p>';
       installOverlay.classList.add('open');
     }
 
@@ -1049,13 +977,15 @@
         tessera.appendChild(body);
         gruppo.appendChild(tessera);
 
-        fetch(APPS_SCRIPT_URL + '?action=ottieniSimbolo&parola=' + encodeURIComponent(parola))
+        var urlSearch = 'https://api.arasaac.org/v1/pictograms/it/bestsearch/' + encodeURIComponent(parola);
+
+        fetch(urlSearch)
           .then(function(res) { return res.json(); })
-          .then(function(risultato) {
+          .then(function(risultati) {
             contenuto.innerHTML = '';
-            if (risultato && risultato.url) {
+            if (risultati && risultati.length > 0) {
               var img = document.createElement('img');
-              img.src = risultato.url;
+              img.src = 'https://static.arasaac.org/pictograms/' + risultati[0]._id + '/' + risultati[0]._id + '_300.png';
               img.alt = parola;
               contenuto.appendChild(img);
             } else {
@@ -1068,7 +998,6 @@
       });
     }
 
-    // Sintesi Vocale
     function leggiTesto(testo) {
       if (!testo || !('speechSynthesis' in window)) return;
       window.speechSynthesis.cancel();
@@ -1082,7 +1011,6 @@
       leggiTesto(testo);
     });
 
-    // Storico e Navigazione
     function salvaInStorico(f) {
       var l = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
       l = l.filter(function(i) { return i !== f; });
