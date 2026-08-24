@@ -667,8 +667,6 @@
       .alt-btn, .speak-btn, .tessera-body::after { display: none !important; }
     }
   </style>
-  <!-- Altri meta tag e font sopra... -->
-  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
   <!-- Google tag (gtag.js) - Google Analytics -->
   <script async src="https://www.googletagmanager.com/gtag/js?id=G-TFTV8PK7V4"></script>
@@ -680,7 +678,6 @@
     gtag('config', 'G-TFTV8PK7V4');
   </script>
 
-</head>
 </head>
 <body>
 
@@ -895,7 +892,21 @@
     window.addEventListener('beforeinstallprompt', function(e) {
       e.preventDefault();
       deferredInstallPrompt = e;
+      var banner = document.getElementById('installBanner');
+      if (banner) banner.classList.add('visible');
     });
+
+    var btnCloseBanner = document.getElementById('installBannerClose');
+    if (btnCloseBanner) {
+      btnCloseBanner.addEventListener('click', function() {
+        document.getElementById('installBanner').classList.remove('visible');
+      });
+    }
+
+    var btnInstallBanner = document.getElementById('installBannerBtn');
+    if (btnInstallBanner) {
+      btnInstallBanner.addEventListener('click', apriInstallModal);
+    }
 
     function apriInstallModal() {
       chiudiMenu();
@@ -1024,6 +1035,16 @@
       var testo = document.getElementById('inputFrase').value.trim();
       leggiTesto(testo);
     });
+
+    // Gestione modalità Bianco e Nero
+    var btnBN = document.getElementById('btnBiancoNero');
+    if (btnBN) {
+      btnBN.addEventListener('click', function() {
+        var container = document.getElementById('strisciaCAA');
+        container.classList.toggle('bn');
+        btnBN.classList.toggle('active');
+      });
+    }
 
     function salvaInStorico(f) {
       var l = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
