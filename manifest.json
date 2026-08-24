@@ -1,0 +1,24 @@
+{
+  "name": "CAArmy – Dai forma alle tue parole",
+  "short_name": "CAArmy",
+  "description": "Applicazione inclusiva in CAA con simboli ARASAAC",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1e3a8a",
+  "orientation": "any",
+  "icons": [
+    {
+      "src": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiDl4AReDkzCkfrZLAbXCbriZPBjN8_4gmCQOflmTfAsC80QU1RkCi2cRbKNhkgcRPmOXwYZd-lopuW1CjFMI2KAZcV4-EGtb3QGClrwGKAhM5p5PHhv2nYvuda-G-62KnipzZKwxymSipzi5GQniW3Q6cRtCyaQNrqG8xbB7fyeqPxbCoi6-PdfgDWjDNr/s320/avatar%20app%20caa.jpg",
+      "sizes": "192x192",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiDl4AReDkzCkfrZLAbXCbriZPBjN8_4gmCQOflmTfAsC80QU1RkCi2cRbKNhkgcRPmOXwYZd-lopuW1CjFMI2KAZcV4-EGtb3QGClrwGKAhM5p5PHhv2nYvuda-G-62KnipzZKwxymSipzi5GQniW3Q6cRtCyaQNrqG8xbB7fyeqPxbCoi6-PdfgDWjDNr/s320/avatar%20app%20caa.jpg",
+      "sizes": "512x512",
+      "type": "image/jpeg",
+      "purpose": "any maskable"
+    }
+  ]
+}
