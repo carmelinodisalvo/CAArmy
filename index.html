@@ -1,0 +1,1648 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CAArmy – Dai forma alle tue parole con la CAA</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --blue: #2563eb;
+      --blue-dark: #1d4ed8;
+      --navy: #1e3a8a;
+      --orange: #ea580c;
+      --yellow: #fde047;
+      --bg: #f4f6f9;
+      --card: #ffffff;
+      --ink: #1e293b;
+      --ink-strong: #0f172a;
+      --muted: #64748b;
+      --border: #e2e8f0;
+      --border-strong: #cbd5e1;
+      --danger: #ef4444;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+
+    html, body { height: 100%; }
+
+    body {
+      min-height: 100vh;
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(circle at 8% 10%, rgba(37, 99, 235, 0.12), transparent 40%),
+        radial-gradient(circle at 92% 15%, rgba(234, 88, 12, 0.10), transparent 42%),
+        radial-gradient(circle at 12% 90%, rgba(253, 224, 71, 0.20), transparent 45%),
+        radial-gradient(circle at 90% 88%, rgba(37, 99, 235, 0.09), transparent 42%),
+        radial-gradient(#d1d5db 1px, transparent 1px);
+      background-size: auto, auto, auto, auto, 24px 24px;
+      background-attachment: fixed, fixed, fixed, fixed, scroll;
+      background-repeat: no-repeat, no-repeat, no-repeat, no-repeat, repeat;
+      color: var(--ink);
+      padding: 30px 12px;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .app-card {
+      position: relative;
+      width: 100%;
+      max-width: 850px;
+      background: var(--card);
+      border-radius: 24px;
+      padding: 28px 24px 32px;
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+      border: 1px solid var(--border);
+      overflow: hidden;
+    }
+
+    /* ---------- Banner installazione (primo ingresso) ---------- */
+    .install-banner {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(135deg, #fef9c3, #fde68a);
+      border: 2px solid var(--yellow);
+      border-radius: 14px;
+      padding: 10px 12px;
+      margin-bottom: 14px;
+    }
+    .install-banner.visible { display: flex; }
+
+    .install-banner-icon { font-size: 20px; flex-shrink: 0; }
+
+    .install-banner-text {
+      flex: 1;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: #78350f;
+      line-height: 1.4;
+    }
+
+    .install-banner-btn {
+      flex-shrink: 0;
+      background: var(--navy);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .install-banner-btn:hover { background: #16306b; }
+
+    .install-banner-close {
+      flex-shrink: 0;
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      border: none;
+      background: rgba(120, 53, 15, 0.12);
+      color: #78350f;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .install-banner-close:hover { background: rgba(120, 53, 15, 0.2); }
+
+    @media (max-width: 480px) {
+      .install-banner { flex-wrap: wrap; }
+      .install-banner-text { flex-basis: 100%; order: 1; }
+      .install-banner-btn { order: 2; }
+      .install-banner-close { order: 3; margin-left: auto; }
+    }
+
+    /* ---------- Top bar with hamburger ---------- */
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 6px;
+    }
+
+    .menu-btn {
+      width: 46px;
+      height: 46px;
+      border-radius: 14px;
+      border: 2px solid var(--ink-strong);
+      background: #ffffff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+      cursor: pointer;
+      flex-shrink: 0;
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+    .menu-btn:hover { background: #f1f5f9; }
+    .menu-btn:active { transform: scale(0.95); }
+    .menu-btn span {
+      display: block;
+      width: 20px;
+      height: 3px;
+      border-radius: 2px;
+      background: var(--ink-strong);
+    }
+
+    .top-bar-spacer { width: 46px; flex-shrink: 0; }
+
+    .view-title {
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    /* ---------- Header & Avatar ---------- */
+    .brand-header {
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+    .avatar-wrapper {
+      width: 108px;
+      height: 108px;
+      margin: 4px auto 12px auto;
+      border-radius: 50%;
+      background: var(--yellow);
+      padding: 4px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .avatar-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 50%;
+    }
+
+    .brand-title {
+      font-family: 'Baloo 2', sans-serif;
+      font-size: 40px;
+      font-weight: 800;
+      color: var(--navy);
+      letter-spacing: -0.5px;
+    }
+
+    .brand-title span.caa { color: var(--blue); }
+    .brand-title span.army { color: var(--orange); }
+
+    .brand-tagline {
+      font-size: 14px;
+      color: var(--muted);
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    /* ---------- Search / Input ---------- */
+    .search-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+
+    .input-wrapper { width: 100%; max-width: 620px; margin: 0 auto; }
+
+    .input-field {
+      width: 100%;
+      min-height: 110px;
+      padding: 18px 20px;
+      font-size: 19px;
+      font-weight: 500;
+      line-height: 1.5;
+      text-align: center;
+      resize: vertical;
+      border: 2px solid var(--border-strong);
+      border-radius: 16px;
+      outline: none;
+      background: #ffffff;
+      color: var(--ink-strong);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .input-field:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+
+    .input-field::placeholder { color: #94a3b8; font-weight: 500; }
+
+    .btn-primary {
+      width: 100%;
+      max-width: 620px;
+      padding: 16px 24px;
+      font-size: 17px;
+      font-weight: 700;
+      color: #ffffff;
+      background: var(--blue);
+      border: none;
+      border-radius: 14px;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    .btn-primary:hover { background: var(--blue-dark); }
+    .btn-primary:active { transform: scale(0.98); }
+
+    /* ---------- Striscia CAA ---------- */
+    .strip-container {
+      background: #fafafa;
+      border: 2px dashed var(--border-strong);
+      border-radius: 16px;
+      padding: 24px 20px;
+      min-height: 200px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .strip-placeholder {
+      width: 100%;
+      text-align: center;
+      color: #94a3b8;
+      font-size: 15px;
+      padding: 40px 0;
+      font-weight: 500;
+    }
+
+    .tessera-caa {
+      width: 115px;
+      background: #ffffff;
+      border: 3px solid var(--ink-strong);
+      border-radius: 14px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      transition: transform 0.15s ease;
+    }
+
+    .tessera-caa:hover { transform: translateY(-2px); }
+
+    .tessera-header {
+      width: 100%;
+      background: #ffffff;
+      border-bottom: 2px solid var(--ink-strong);
+      padding: 6px 4px;
+      text-align: center;
+      font-size: 13px;
+      font-weight: 800;
+      color: var(--ink-strong);
+      text-transform: uppercase;
+      word-break: break-word;
+      cursor: text;
+      outline: none;
+    }
+    .tessera-header:hover, .tessera-header:focus {
+      background: #fffbeb;
+    }
+
+    .tessera-body {
+      width: 100%;
+      height: 95px;
+      padding: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #ffffff;
+      position: relative;
+      cursor: pointer;
+    }
+    .tessera-body:hover { background: #f8fafc; }
+
+    .alt-btn {
+      position: absolute;
+      left: 4px;
+      top: 4px;
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border-strong);
+      background: #ffffff;
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 1;
+      box-shadow: 0 1px 3px rgba(15,23,42,0.15);
+      transition: background 0.15s ease, transform 0.1s ease;
+      z-index: 2;
+    }
+    .alt-btn:hover { background: #e2e8f0; }
+    .alt-btn:active { transform: scale(0.92); }
+
+    .speak-btn {
+      position: absolute;
+      right: 4px;
+      top: 4px;
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border-strong);
+      background: #ffffff;
+      font-size: 13px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 1;
+      box-shadow: 0 1px 3px rgba(15,23,42,0.15);
+      transition: background 0.15s ease, transform 0.1s ease;
+      z-index: 2;
+    }
+    .speak-btn:hover { background: #e2e8f0; }
+    .speak-btn:active { transform: scale(0.92); }
+
+    .tessera-body::after {
+      content: "📷";
+      position: absolute;
+      right: 4px;
+      bottom: 4px;
+      font-size: 12px;
+      opacity: 0;
+      transition: opacity 0.15s ease;
+      background: rgba(255,255,255,0.9);
+      border-radius: 6px;
+      padding: 1px 3px;
+    }
+    .tessera-body:hover::after { opacity: 1; }
+
+    .tessera-body-content {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .tessera-body img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+    .strip-container.bn .tessera-body img {
+      filter: grayscale(100%);
+    }
+
+    .btn-secondary.active {
+      background: var(--ink-strong);
+      color: #ffffff;
+    }
+
+    .loading-text { font-size: 12px; color: #94a3b8; font-weight: 600; }
+    .no-symbol { font-size: 11px; color: var(--danger); text-align: center; font-weight: 700; padding: 2px; }
+
+    .tessera-group {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .punteggiatura-separatore {
+      align-self: center;
+      font-size: 48px;
+      font-weight: 800;
+      color: var(--ink-strong);
+      line-height: 1;
+      padding: 0 2px;
+    }
+
+    /* ---------- Actions ---------- */
+    .actions-bar {
+      margin-top: 24px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+
+    .btn-secondary {
+      padding: 12px 20px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #334155;
+      background: #ffffff;
+      border: 2px solid var(--ink-strong);
+      border-radius: 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+
+    .btn-secondary:hover { background: #f1f5f9; }
+    .btn-secondary:active { transform: scale(0.98); }
+
+    .footer-note {
+      text-align: center;
+      margin-top: 24px;
+      font-size: 12px;
+      color: #94a3b8;
+      font-weight: 500;
+    }
+
+    /* ---------- Popup simboli alternativi ---------- */
+    .alt-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 60;
+      padding: 20px;
+    }
+    .alt-overlay.open { display: flex; }
+
+    .alt-modal {
+      background: #ffffff;
+      border-radius: 20px;
+      padding: 22px;
+      width: 100%;
+      max-width: 420px;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    }
+
+    .alt-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .alt-modal-title {
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--navy);
+    }
+
+    .alt-modal-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 9px;
+      border: none;
+      background: #f1f5f9;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    .alt-modal-close:hover { background: #e2e8f0; }
+
+    .alt-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+    }
+
+    .alt-option {
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      background: #ffffff;
+      padding: 6px;
+      cursor: pointer;
+      height: 84px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: border-color 0.15s ease, transform 0.1s ease;
+    }
+    .alt-option:hover { border-color: var(--blue); transform: translateY(-2px); }
+    .alt-option img { max-width: 100%; max-height: 100%; object-fit: contain; }
+
+    .alt-modal-empty {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 30px 10px;
+    }
+
+    .install-modal p {
+      font-size: 14px;
+      color: var(--ink);
+      line-height: 1.7;
+      margin-bottom: 10px;
+    }
+    .install-modal .install-steps {
+      list-style: none;
+      counter-reset: passo;
+    }
+    .install-modal .install-steps li {
+      counter-increment: passo;
+      font-size: 14px;
+      color: var(--ink);
+      line-height: 1.6;
+      padding: 8px 0 8px 34px;
+      position: relative;
+      border-bottom: 1px solid var(--border);
+    }
+    .install-modal .install-steps li:last-child { border-bottom: none; }
+    .install-modal .install-steps li::before {
+      content: counter(passo);
+      position: absolute;
+      left: 0;
+      top: 6px;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--blue);
+      color: #fff;
+      font-size: 12px;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .install-modal .btn-primary {
+      margin-top: 14px;
+    }
+
+    /* ---------- Drawer menu ---------- */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+      z-index: 40;
+    }
+    .overlay.open { opacity: 1; pointer-events: auto; }
+
+    .drawer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+      width: 270px;
+      max-width: 82vw;
+      background: var(--navy);
+      color: #fff;
+      transform: translateX(-100%);
+      transition: transform 0.25s ease;
+      z-index: 50;
+      padding: 20px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: 8px 0 24px rgba(0,0,0,0.2);
+    }
+    .drawer.open { transform: translateX(0); }
+
+    .drawer-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .drawer-title {
+      font-family: 'Baloo 2', sans-serif;
+      font-weight: 800;
+      font-size: 22px;
+    }
+    .drawer-title .caa { color: #93c5fd; }
+    .drawer-title .army { color: var(--yellow); }
+
+    .drawer-close {
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: none;
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .drawer-close:hover { background: rgba(255,255,255,0.2); }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 12px;
+      border-radius: 14px;
+      background: rgba(255,255,255,0.06);
+      border: 2px solid transparent;
+      cursor: pointer;
+      transition: background 0.15s ease, border-color 0.15s ease;
+      text-align: left;
+      color: #ffffff;
+    }
+    .nav-item:hover { background: rgba(255,255,255,0.12); }
+    .nav-item.active {
+      background: rgba(255,255,255,0.14);
+      border-color: var(--yellow);
+    }
+
+    .nav-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .nav-label {
+      font-weight: 700;
+      font-size: 15px;
+      color: #ffffff;
+    }
+
+    .nav-item-install {
+      margin-top: 10px;
+      background: rgba(253, 224, 71, 0.14);
+      border-color: rgba(253, 224, 71, 0.4);
+    }
+    .nav-item-install:hover { background: rgba(253, 224, 71, 0.22); }
+    .nav-item-install .nav-icon { background: var(--yellow); }
+
+    .drawer-footer {
+      margin-top: auto;
+      font-size: 11px;
+      color: rgba(255,255,255,0.55);
+      font-weight: 500;
+      line-height: 1.5;
+      padding-top: 12px;
+    }
+
+    /* ---------- Secondary views (storico / aiuto / info) ---------- */
+    .view-panel { display: none; }
+    .view-panel.active { display: block; }
+
+    .panel-card {
+      background: #fafafa;
+      border: 2px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      min-height: 200px;
+    }
+
+    .panel-empty {
+      text-align: center;
+      color: #94a3b8;
+      font-size: 14px;
+      font-weight: 500;
+      padding: 40px 10px;
+    }
+
+    .history-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: #ffffff;
+      border: 2px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      margin-bottom: 10px;
+    }
+    .history-text { font-weight: 600; font-size: 14px; color: var(--ink-strong); }
+    .history-actions { display: flex; gap: 8px; flex-shrink: 0; }
+    .history-btn {
+      border: none;
+      background: var(--border);
+      border-radius: 8px;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .history-btn:hover { background: var(--border-strong); }
+
+    .help-block { margin-bottom: 16px; }
+    .help-block h3 {
+      font-family: 'Baloo 2', sans-serif;
+      font-size: 16px;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+    .help-block p { font-size: 14px; color: var(--ink); line-height: 1.6; }
+
+    .voice-picker {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .voice-picker select {
+      flex: 1;
+      min-width: 160px;
+      padding: 10px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--ink-strong);
+      background: #ffffff;
+      border: 2px solid var(--border-strong);
+      border-radius: 10px;
+      outline: none;
+    }
+    .voice-picker select:focus { border-color: var(--blue); }
+    .voice-picker .btn-secondary {
+      padding: 10px 16px;
+      font-size: 13px;
+    }
+
+    .info-logo-row {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+    .info-logo-row img {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      border: 2px solid var(--ink-strong);
+    }
+    .info-logo-row div p { font-size: 13px; color: var(--muted); font-weight: 600; }
+    .info-logo-row div strong { font-family: 'Baloo 2', sans-serif; font-size: 18px; color: var(--navy); }
+
+    .channel-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: #ffffff;
+      border: 2px solid var(--border);
+      border-radius: 14px;
+      padding: 14px 16px;
+      margin-bottom: 10px;
+      text-decoration: none;
+      color: var(--ink-strong);
+      transition: border-color 0.15s ease, transform 0.1s ease;
+    }
+    .channel-item:last-child { margin-bottom: 0; }
+    .channel-item:hover { border-color: var(--blue); transform: translateY(-1px); }
+
+    .channel-icon {
+      font-size: 22px;
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .channel-label { flex: 1; font-weight: 700; font-size: 15px; }
+
+    .channel-arrow { color: var(--muted); font-size: 15px; flex-shrink: 0; }
+
+    /* ---------- Print ---------- */
+    @media print {
+      body { background: white !important; padding: 0; }
+      .app-card { box-shadow: none; border: none; padding: 0; max-width: 100%; }
+      .search-area, .actions-bar, .brand-tagline, .footer-note, .avatar-wrapper, .top-bar, .drawer, .overlay { display: none !important; }
+      .strip-container { border: none; padding: 0; background: white; justify-content: flex-start; }
+      .strip-container.bn .tessera-body img { filter: grayscale(100%); }
+      .tessera-caa { break-inside: avoid; }
+      .tessera-group { break-inside: avoid; }
+      .alt-btn, .speak-btn, .tessera-body::after { display: none !important; }
+    }
+
+    @media (max-width: 480px) {
+      .brand-title { font-size: 32px; }
+      .search-area { flex-direction: column; }
+      .btn-primary { padding: 14px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="overlay" id="overlay"></div>
+
+  <nav class="drawer" id="drawer" aria-label="Menu principale">
+    <div class="drawer-header">
+      <span class="drawer-title"><span class="caa">CAA</span><span class="army">rmy</span></span>
+      <button class="drawer-close" id="btnCloseDrawer" aria-label="Chiudi menu">✕</button>
+    </div>
+
+    <button class="nav-item active" data-view="home">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">Home</span>
+    </button>
+    <button class="nav-item" data-view="storico">
+      <span class="nav-icon">📜</span>
+      <span class="nav-label">Storico frasi</span>
+    </button>
+    <button class="nav-item" data-view="aiuto">
+      <span class="nav-icon">❓</span>
+      <span class="nav-label">Aiuto</span>
+    </button>
+    <button class="nav-item" data-view="info">
+      <span class="nav-icon">ℹ️</span>
+      <span class="nav-label">Info</span>
+    </button>
+
+    <button class="nav-item" data-view="canali">
+      <span class="nav-icon">🌐</span>
+      <span class="nav-label">Canali ufficiali</span>
+    </button>
+
+    <button class="nav-item nav-item-install" id="btnInstallApp" type="button">
+      <span class="nav-icon">📲</span>
+      <span class="nav-label">Installa app</span>
+    </button>
+
+    <p class="drawer-footer">Strumento didattico gratuito realizzato dal maestro Carmelo Di Salvo. Simboli ARASAAC.</p>
+  </nav>
+
+  <div class="app-card">
+
+    <div class="install-banner" id="installBanner">
+      <span class="install-banner-icon">📲</span>
+      <span class="install-banner-text">Installa CAArmy sul tuo dispositivo per aprirla più velocemente, come un'app.</span>
+      <button class="install-banner-btn" id="installBannerBtn" type="button">Installa</button>
+      <button class="install-banner-close" id="installBannerClose" aria-label="Chiudi avviso">✕</button>
+    </div>
+
+    <div class="top-bar">
+      <button class="menu-btn" id="btnMenu" aria-label="Apri menu">
+        <span></span><span></span><span></span>
+      </button>
+      <span class="view-title" id="viewTitle">&nbsp;</span>
+      <span class="top-bar-spacer"></span>
+    </div>
+
+    <!-- ===================== HOME ===================== -->
+    <section class="view-panel active" id="view-home">
+      <header class="brand-header">
+        <div class="avatar-wrapper">
+          <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiDl4AReDkzCkfrZLAbXCbriZPBjN8_4gmCQOflmTfAsC80QU1RkCi2cRbKNhkgcRPmOXwYZd-lopuW1CjFMI2KAZcV4-EGtb3QGClrwGKAhM5p5PHhv2nYvuda-G-62KnipzZKwxymSipzi5GQniW3Q6cRtCyaQNrqG8xbB7fyeqPxbCoi6-PdfgDWjDNr/s320/avatar%20app%20caa.jpg" alt="Maestro Carmelo Avatar">
+        </div>
+        <h1 class="brand-title">
+          <span class="caa">CAA</span><span class="army">rmy</span>
+        </h1>
+        <p class="brand-tagline">Dai forma alle tue parole!</p>
+      </header>
+
+      <div class="search-area">
+        <div class="input-wrapper">
+          <textarea id="inputFrase" class="input-field" placeholder="Scrivi una frase (es. io voglio mangiare la mela)..." rows="3"></textarea>
+        </div>
+        <button class="btn-primary" id="btnGenera">Genera Simboli in CAA</button>
+      </div>
+
+      <div id="strisciaCAA" class="strip-container">
+        <div class="strip-placeholder">
+          <span>Digita una frase sopra per comporre la tua striscia di comunicazione.</span>
+        </div>
+      </div>
+
+      <div class="actions-bar">
+        <button class="btn-secondary" id="btnBiancoNero">⚫⚪ Bianco e nero</button>
+        <button class="btn-secondary" id="btnAscolta">🔊 Ascolta</button>
+        <button class="btn-secondary" onclick="window.print()">🖨️ STAMPA / SALVA (A4)</button>
+      </div>
+
+      <div class="footer-note">
+        © CAArmy – Strumento Didattico Gratuito realizzato dal maestro Carmelo Di Salvo | Simboli ARASAAC
+      </div>
+    </section>
+
+    <!-- ===================== STORICO ===================== -->
+    <section class="view-panel" id="view-storico">
+      <div class="panel-card">
+        <div id="storicoList"></div>
+      </div>
+    </section>
+
+    <!-- ===================== AIUTO ===================== -->
+    <section class="view-panel" id="view-aiuto">
+      <div class="panel-card">
+        <div class="help-block">
+          <h3>Come si usa CAArmy</h3>
+          <p>Scrivi una frase nella casella di testo, poi premi "Genera Simboli in CAA": ogni parola verrà trasformata in un simbolo illustrato, componendo una striscia di comunicazione.</p>
+        </div>
+        <div class="help-block">
+          <h3>Modifica la parola di una tessera</h3>
+          <p>Tocca la scritta sopra al simbolo per modificarla direttamente: utile se vuoi cambiare la forma della parola mostrata, senza rigenerare tutta la frase.</p>
+        </div>
+        <div class="help-block">
+          <h3>Cambia simbolo (🔀)</h3>
+          <p>Ogni tessera ha in alto a sinistra un'iconcina 🔀: toccala per scegliere tra alcuni simboli alternativi trovati per quella parola, se quello proposto non è quello giusto.</p>
+        </div>
+        <div class="help-block">
+          <h3>Carica una foto personale</h3>
+          <p>Tocca il riquadro dell'immagine di una tessera per caricare una foto dal dispositivo al posto del simbolo, ad esempio per usare l'immagine reale di una persona o di un oggetto.</p>
+        </div>
+        <div class="help-block">
+          <h3>Bianco e nero</h3>
+          <p>Premi "Bianco e nero" per trasformare tutti i simboli in scala di grigi, comodo per la stampa in bianco e nero.</p>
+        </div>
+        <div class="help-block">
+          <h3>Ascolta la frase</h3>
+          <p>Premi "Ascolta" per far leggere ad alta voce le parole mostrate sulle tessere, incluse le eventuali modifiche fatte a mano. Tocca invece l'icona 🔊 su una singola tessera per sentire solo quella parola.</p>
+        </div>
+        <div class="help-block">
+          <h3>Voce di lettura</h3>
+          <p>CAArmy sceglie automaticamente la voce italiana migliore disponibile sul dispositivo (preferendo una voce maschile e un ritmo più lento). Se il tuo dispositivo ne offre altre, puoi sceglierla qui:</p>
+          <div class="voice-picker">
+            <select id="selettoreVoce"></select>
+            <button type="button" class="btn-secondary" id="btnProvaVoce">🔊 Prova voce</button>
+          </div>
+        </div>
+        <div class="help-block">
+          <h3>Stampa o salva</h3>
+          <p>Premi "Stampa / Salva (A4)" per ottenere una versione stampabile della striscia di simboli, pronta per l'uso in classe.</p>
+        </div>
+        <div class="help-block">
+          <h3>Storico frasi</h3>
+          <p>Le frasi generate vengono salvate automaticamente nella sezione "Storico frasi" del menu, da cui puoi richiamarle o eliminarle.</p>
+        </div>
+        <div class="help-block">
+          <h3>Nota sui verbi</h3>
+          <p>Al momento i verbi vengono riconosciuti meglio se scritti all'infinito (es. "mangiare" invece di "mangio").</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== INFO ===================== -->
+    <section class="view-panel" id="view-info">
+      <div class="panel-card">
+        <div class="info-logo-row">
+          <img src="https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiDl4AReDkzCkfrZLAbXCbriZPBjN8_4gmCQOflmTfAsC80QU1RkCi2cRbKNhkgcRPmOXwYZd-lopuW1CjFMI2KAZcV4-EGtb3QGClrwGKAhM5p5PHhv2nYvuda-G-62KnipzZKwxymSipzi5GQniW3Q6cRtCyaQNrqG8xbB7fyeqPxbCoi6-PdfgDWjDNr/s320/avatar%20app%20caa.jpg" alt="Maestro Carmelo Avatar">
+          <div>
+            <strong>CAArmy</strong>
+            <p>Dai forma alle tue parole con la CAA</p>
+          </div>
+        </div>
+        <div class="help-block">
+          <h3>Cos'è</h3>
+          <p>CAArmy è uno strumento didattico gratuito che trasforma le frasi in strisce di Comunicazione Aumentativa Alternativa (CAA), pensato per il supporto alla comunicazione in classe.</p>
+        </div>
+        <div class="help-block">
+          <h3>Simboli</h3>
+          <p>I pittogrammi utilizzati sono forniti da ARASAAC.</p>
+        </div>
+        <div class="help-block">
+          <h3>Realizzato da</h3>
+          <p>Maestro Carmelo Di Salvo.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===================== CANALI UFFICIALI ===================== -->
+    <section class="view-panel" id="view-canali">
+      <div class="panel-card">
+        <a class="channel-item" href="https://www.facebook.com/share/1CcHL1VQBR/" target="_blank" rel="noopener">
+          <span class="channel-icon">📘</span>
+          <span class="channel-label">Pagina Facebook</span>
+          <span class="channel-arrow">↗</span>
+        </a>
+        <a class="channel-item" href="https://t.me/biancosulnero" target="_blank" rel="noopener">
+          <span class="channel-icon">📢</span>
+          <span class="channel-label">Canale Telegram</span>
+          <span class="channel-arrow">↗</span>
+        </a>
+        <a class="channel-item" href="https://biancosulnero.blogspot.com/" target="_blank" rel="noopener">
+          <span class="channel-icon">✍️</span>
+          <span class="channel-label">Blog Bianco sul Nero</span>
+          <span class="channel-arrow">↗</span>
+        </a>
+        <a class="channel-item" href="https://www.guidedidattichegratis.it/?m=1" target="_blank" rel="noopener">
+          <span class="channel-icon">📚</span>
+          <span class="channel-label">Guide Didattiche Gratis</span>
+          <span class="channel-arrow">↗</span>
+        </a>
+      </div>
+    </section>
+
+  </div>
+
+  <div class="alt-overlay" id="altOverlay">
+    <div class="alt-modal">
+      <div class="alt-modal-header">
+        <span class="alt-modal-title" id="altModalTitle">Scegli un simbolo</span>
+        <button class="alt-modal-close" id="altModalClose" aria-label="Chiudi">✕</button>
+      </div>
+      <div id="altGrid" class="alt-grid"></div>
+    </div>
+  </div>
+
+  <div class="alt-overlay" id="installOverlay">
+    <div class="alt-modal install-modal">
+      <div class="alt-modal-header">
+        <span class="alt-modal-title">📲 Installa CAArmy</span>
+        <button class="alt-modal-close" id="installModalClose" aria-label="Chiudi">✕</button>
+      </div>
+      <div id="installBody"></div>
+    </div>
+  </div>
+
+  <script>
+    var VIEW_TITLES = {
+      home: '',
+      storico: 'Storico frasi',
+      aiuto: 'Aiuto',
+      info: 'Info',
+      canali: 'Canali ufficiali'
+    };
+    var STORAGE_KEY = 'caarmy_storico';
+
+    /* ---------- Popup simboli alternativi ---------- */
+    var altOverlay = document.getElementById('altOverlay');
+    var altGrid = document.getElementById('altGrid');
+    var altModalTitle = document.getElementById('altModalTitle');
+
+    function apriAlternative(parolaCercata, contenutoTarget, headerTarget) {
+      if (typeof google === 'undefined' || !google.script || !google.script.run) return;
+
+      altModalTitle.innerText = 'Simboli per "' + (headerTarget.innerText.trim() || parolaCercata) + '"';
+      altGrid.innerHTML = '<div class="alt-modal-empty">Cerco le alternative...</div>';
+      altOverlay.classList.add('open');
+
+      google.script.run
+        .withSuccessHandler(function(risultati) {
+          if (!risultati || risultati.length === 0) {
+            altGrid.innerHTML = '<div class="alt-modal-empty">Nessuna alternativa trovata.</div>';
+            return;
+          }
+          altGrid.innerHTML = '';
+          risultati.forEach(function(simbolo) {
+            var opzione = document.createElement('button');
+            opzione.type = 'button';
+            opzione.className = 'alt-option';
+
+            var img = document.createElement('img');
+            img.src = simbolo.url;
+            img.alt = headerTarget.innerText || parolaCercata;
+            opzione.appendChild(img);
+
+            opzione.addEventListener('click', function() {
+              contenutoTarget.innerHTML = '';
+              var nuovaImg = document.createElement('img');
+              nuovaImg.src = simbolo.url;
+              nuovaImg.alt = headerTarget.innerText || parolaCercata;
+              contenutoTarget.appendChild(nuovaImg);
+              chiudiAlternative();
+            });
+
+            altGrid.appendChild(opzione);
+          });
+        })
+        .withFailureHandler(function() {
+          altGrid.innerHTML = '<div class="alt-modal-empty">Errore di rete, riprova.</div>';
+        })
+        .cercaSimboliAlternativi(parolaCercata);
+    }
+
+    function chiudiAlternative() {
+      altOverlay.classList.remove('open');
+    }
+
+    document.getElementById('altModalClose').addEventListener('click', chiudiAlternative);
+    altOverlay.addEventListener('click', function(e) {
+      if (e.target === altOverlay) chiudiAlternative();
+    });
+
+    /* ---------- Installa app ---------- */
+    var installOverlay = document.getElementById('installOverlay');
+    var installBody = document.getElementById('installBody');
+    var deferredInstallPrompt = null;
+
+    window.addEventListener('beforeinstallprompt', function(e) {
+      e.preventDefault();
+      deferredInstallPrompt = e;
+    });
+
+    function apriInstallModal() {
+      chiudiMenu();
+
+      if (deferredInstallPrompt) {
+        installBody.innerHTML = '<p>Il tuo browser può installare CAArmy come app: tocca il pulsante qui sotto.</p>' +
+          '<button class="btn-primary" id="btnInstallPrompt">📲 Installa ora</button>';
+        installOverlay.classList.add('open');
+        document.getElementById('btnInstallPrompt').addEventListener('click', function() {
+          installOverlay.classList.remove('open');
+          deferredInstallPrompt.prompt();
+          deferredInstallPrompt.userChoice.then(function(scelta) {
+            if (scelta && scelta.outcome === 'accepted') {
+              nascondiBanner(true);
+            }
+          }).finally(function() {
+            deferredInstallPrompt = null;
+          });
+        });
+        return;
+      }
+
+      var ua = navigator.userAgent || '';
+      var iOS = /iPad|iPhone|iPod/.test(ua);
+      var android = /Android/.test(ua);
+
+      if (iOS) {
+        installBody.innerHTML =
+          '<ol class="install-steps">' +
+            '<li>Apri CAArmy da Safari (non da un\'altra app).</li>' +
+            '<li>Tocca l\'icona "Condividi" 􀈂 nella barra in basso.</li>' +
+            '<li>Scorri e scegli "Aggiungi a Home".</li>' +
+            '<li>Conferma: l\'icona di CAArmy comparirà sulla schermata Home, come un\'app.</li>' +
+          '</ol>';
+      } else if (android) {
+        installBody.innerHTML =
+          '<ol class="install-steps">' +
+            '<li>Apri CAArmy da Chrome.</li>' +
+            '<li>Tocca il menu ⋮ in alto a destra.</li>' +
+            '<li>Scegli "Installa app" oppure "Aggiungi a schermata Home".</li>' +
+            '<li>Conferma: CAArmy si aprirà come un\'app, senza barra del browser.</li>' +
+          '</ol>';
+      } else {
+        installBody.innerHTML =
+          '<ol class="install-steps">' +
+            '<li>Apri CAArmy da Chrome o Edge sul computer.</li>' +
+            '<li>Cerca l\'icona di installazione ⊕ nella barra degli indirizzi, a destra.</li>' +
+            '<li>Clicca "Installa" nella finestra che appare.</li>' +
+            '<li>CAArmy si aprirà in una sua finestra dedicata, come un\'app.</li>' +
+          '</ol>';
+      }
+
+      installOverlay.classList.add('open');
+    }
+
+    function chiudiInstallModal() {
+      installOverlay.classList.remove('open');
+    }
+
+    /* ---------- Banner installazione al primo ingresso ---------- */
+    var installBanner = document.getElementById('installBanner');
+    var INSTALL_BANNER_KEY = 'caarmy_install_banner_nascosto';
+
+    function appGiaInstallata() {
+      return (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) ||
+        window.navigator.standalone === true;
+    }
+
+    function mostraBannerSeOpportuno() {
+      if (appGiaInstallata()) return;
+      if (localStorage.getItem(INSTALL_BANNER_KEY) === '1') return;
+      installBanner.classList.add('visible');
+    }
+
+    function nascondiBanner(ricorda) {
+      installBanner.classList.remove('visible');
+      if (ricorda) localStorage.setItem(INSTALL_BANNER_KEY, '1');
+    }
+
+    document.getElementById('installBannerBtn').addEventListener('click', function() {
+      apriInstallModal();
+    });
+    document.getElementById('installBannerClose').addEventListener('click', function() {
+      nascondiBanner(true);
+    });
+
+    window.addEventListener('appinstalled', function() {
+      nascondiBanner(true);
+    });
+
+    mostraBannerSeOpportuno();
+
+    document.getElementById('btnInstallApp').addEventListener('click', apriInstallModal);
+
+    document.getElementById('installModalClose').addEventListener('click', chiudiInstallModal);
+    installOverlay.addEventListener('click', function(e) {
+      if (e.target === installOverlay) chiudiInstallModal();
+    });
+
+    document.getElementById('btnGenera').addEventListener('click', generaStriscia);
+    document.getElementById('inputFrase').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        generaStriscia();
+      }
+    });
+    document.getElementById('btnAscolta').addEventListener('click', leggiFrase);
+
+    var selettoreVoce = document.getElementById('selettoreVoce');
+    if (selettoreVoce) {
+      selettoreVoce.addEventListener('change', function() {
+        var nomeScelto = selettoreVoce.value;
+        if (!nomeScelto || !('speechSynthesis' in window)) return;
+        var voci = window.speechSynthesis.getVoices();
+        for (var i = 0; i < voci.length; i++) {
+          if (voci[i].name === nomeScelto) {
+            vocePreferita = voci[i];
+            break;
+          }
+        }
+        localStorage.setItem(VOICE_KEY, nomeScelto);
+      });
+    }
+
+    var btnProvaVoce = document.getElementById('btnProvaVoce');
+    if (btnProvaVoce) {
+      btnProvaVoce.addEventListener('click', function() {
+        leggiTesto('Ciao, questa è la mia voce.');
+      });
+    }
+
+    var bnAttivo = false;
+    document.getElementById('btnBiancoNero').addEventListener('click', function() {
+      bnAttivo = !bnAttivo;
+      document.getElementById('strisciaCAA').classList.toggle('bn', bnAttivo);
+      this.classList.toggle('active', bnAttivo);
+      this.innerText = bnAttivo ? '🎨 Torna a colori' : '⚫⚪ Bianco e nero';
+    });
+
+    function generaStriscia() {
+      var input = document.getElementById('inputFrase');
+      var container = document.getElementById('strisciaCAA');
+      var testo = input.value.trim();
+
+      if (!testo) {
+        container.innerHTML = '<div class="strip-placeholder"><span>Inserisci del testo per generare i simboli.</span></div>';
+        return;
+      }
+
+      salvaInStorico(testo);
+
+      var parole = testo
+        .replace(/([.,;:!?])/g, ' $1 ')
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+      container.innerHTML = '';
+
+      if (typeof google === 'undefined' || !google.script || !google.script.run) {
+        container.innerHTML = '<div class="strip-placeholder"><span>⚠️ Questa pagina va aperta dal link di pubblicazione di Google Apps Script (Distribuisci → apri app web), non come file locale.</span></div>';
+        return;
+      }
+
+      var ultimoGruppo = null;
+
+      parole.forEach(function(parola) {
+        var soloPunteggiatura = /^[.,;:!?]+$/.test(parola);
+
+        if (soloPunteggiatura) {
+          var separatore = document.createElement('span');
+          separatore.className = 'punteggiatura-separatore';
+          separatore.innerText = parola;
+          if (ultimoGruppo) {
+            ultimoGruppo.appendChild(separatore);
+          } else {
+            container.appendChild(separatore);
+          }
+          return;
+        }
+
+        var gruppo = document.createElement('div');
+        gruppo.className = 'tessera-group';
+        container.appendChild(gruppo);
+        ultimoGruppo = gruppo;
+
+        var tessera = document.createElement('div');
+        tessera.className = 'tessera-caa';
+
+        var header = document.createElement('div');
+        header.className = 'tessera-header';
+        header.innerText = parola;
+        header.contentEditable = 'true';
+        header.spellcheck = false;
+        header.title = 'Clicca per modificare la parola';
+        header.addEventListener('keydown', function(e) {
+          if (e.key === 'Enter') { e.preventDefault(); header.blur(); }
+        });
+        header.addEventListener('blur', function() {
+          if (!header.innerText.trim()) header.innerText = parola;
+        });
+
+        var body = document.createElement('div');
+        body.className = 'tessera-body';
+        body.title = 'Clicca per caricare un\'immagine dal dispositivo';
+
+        var contenuto = document.createElement('div');
+        contenuto.className = 'tessera-body-content';
+        contenuto.innerHTML = '<span class="loading-text">Cerca...</span>';
+        body.appendChild(contenuto);
+
+        var altBtn = document.createElement('button');
+        altBtn.type = 'button';
+        altBtn.className = 'alt-btn';
+        altBtn.title = 'Cambia simbolo tra alternative';
+        altBtn.innerText = '🔀';
+        body.appendChild(altBtn);
+
+        var speakBtn = document.createElement('button');
+        speakBtn.type = 'button';
+        speakBtn.className = 'speak-btn';
+        speakBtn.title = 'Ascolta questa parola';
+        speakBtn.innerText = '🔊';
+        body.appendChild(speakBtn);
+
+        speakBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          leggiTesto(header.innerText.trim() || parola);
+        });
+
+        var fileInput = document.createElement('input');
+        fileInput.type = 'file';
+        fileInput.accept = 'image/*';
+        fileInput.style.display = 'none';
+        fileInput.addEventListener('change', function() {
+          var file = fileInput.files && fileInput.files[0];
+          if (!file) return;
+          var reader = new FileReader();
+          reader.onload = function(ev) {
+            contenuto.innerHTML = '';
+            var img = document.createElement('img');
+            img.src = ev.target.result;
+            img.alt = header.innerText;
+            contenuto.appendChild(img);
+          };
+          reader.readAsDataURL(file);
+        });
+
+        body.addEventListener('click', function() {
+          fileInput.click();
+        });
+
+        altBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          apriAlternative(header.innerText.trim() || parola, contenuto, header);
+        });
+
+        tessera.appendChild(header);
+        tessera.appendChild(body);
+        tessera.appendChild(fileInput);
+        gruppo.appendChild(tessera);
+
+        google.script.run
+          .withSuccessHandler(function(risultato) {
+            contenuto.innerHTML = '';
+            if (risultato && risultato.url) {
+              var img = document.createElement('img');
+              img.src = risultato.url;
+              img.alt = parola;
+
+              img.onerror = function() {
+                this.onerror = null;
+                this.src = "https://static.arasaac.org/pictograms/" + risultato.id + "/" + risultato.id + "_500.png";
+              };
+
+              contenuto.appendChild(img);
+            } else {
+              contenuto.innerHTML = '<span class="no-symbol">Senza simbolo</span>';
+            }
+          })
+          .withFailureHandler(function() {
+            contenuto.innerHTML = '<span class="no-symbol">Errore rete</span>';
+          })
+          .ottieniSimbolo(parola);
+      });
+    }
+
+    function fraseDalleTessere() {
+      var container = document.getElementById('strisciaCAA');
+      var pezzi = [];
+
+      Array.prototype.forEach.call(container.children, function(el) {
+        if (!el.classList) return;
+
+        if (el.classList.contains('tessera-group')) {
+          var header = el.querySelector('.tessera-header');
+          var testoParola = header ? header.innerText.trim() : '';
+          if (testoParola) pezzi.push(testoParola);
+
+          var segnoNelGruppo = el.querySelector('.punteggiatura-separatore');
+          if (segnoNelGruppo) {
+            var testoSegno = segnoNelGruppo.innerText.trim();
+            if (testoSegno) pezzi.push(testoSegno);
+          }
+        } else if (el.classList.contains('punteggiatura-separatore')) {
+          var segno = el.innerText.trim();
+          if (segno) pezzi.push(segno);
+        }
+      });
+
+      if (pezzi.length === 0) return '';
+
+      var frase = '';
+      pezzi.forEach(function(pezzo) {
+        var ePunteggiatura = /^[.,;:!?]+$/.test(pezzo);
+        if (ePunteggiatura || frase === '') {
+          frase += pezzo;
+        } else {
+          frase += ' ' + pezzo;
+        }
+      });
+      return frase;
+    }
+
+    /* ---------- Voce di lettura ---------- */
+    var TASSO_LETTURA = 0.8;
+    var VOICE_KEY = 'caarmy_voce_scelta';
+    var vocePreferita = null;
+
+    function scegliVoceMigliore(voci) {
+      var italiane = voci.filter(function(v) {
+        return v.lang && v.lang.toLowerCase().indexOf('it') === 0;
+      });
+      if (italiane.length === 0) return null;
+
+      var maschili = italiane.filter(function(v) {
+        return /diego|luca|paolo|marco|matteo|giorgio|niccolò|niccolo|male/i.test(v.name) &&
+          !/elsa|alice|federica|silvia|female/i.test(v.name);
+      });
+      return maschili.length > 0 ? maschili[0] : italiane[0];
+    }
+
+    function popolaSelettoreVoci(voci) {
+      var select = document.getElementById('selettoreVoce');
+      if (!select) return;
+
+      var italiane = voci.filter(function(v) {
+        return v.lang && v.lang.toLowerCase().indexOf('it') === 0;
+      });
+
+      if (italiane.length === 0) {
+        select.innerHTML = '<option value="">Voce predefinita del dispositivo</option>';
+        return;
+      }
+
+      select.innerHTML = '';
+      italiane.forEach(function(v) {
+        var opt = document.createElement('option');
+        opt.value = v.name;
+        opt.innerText = v.name;
+        if (vocePreferita && v.name === vocePreferita.name) opt.selected = true;
+        select.appendChild(opt);
+      });
+    }
+
+    function aggiornaVoci() {
+      if (!('speechSynthesis' in window)) return;
+      var voci = window.speechSynthesis.getVoices();
+      if (voci.length === 0) return;
+
+      var nomeSalvato = localStorage.getItem(VOICE_KEY);
+      var salvata = nomeSalvato ? voci.filter(function(v) { return v.name === nomeSalvato; })[0] : null;
+
+      vocePreferita = salvata || scegliVoceMigliore(voci);
+      popolaSelettoreVoci(voci);
+    }
+
+    if ('speechSynthesis' in window) {
+      aggiornaVoci();
+      window.speechSynthesis.onvoiceschanged = aggiornaVoci;
+    }
+
+    function leggiTesto(testo) {
+      if (!testo) return;
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      var utterance = new SpeechSynthesisUtterance(testo);
+      utterance.lang = 'it-IT';
+      utterance.rate = TASSO_LETTURA;
+      if (vocePreferita) utterance.voice = vocePreferita;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function leggiFrase() {
+      var testo = fraseDalleTessere();
+      if (!testo) {
+        testo = document.getElementById('inputFrase').value.trim();
+      }
+      leggiTesto(testo);
+    }
+
+    /* ---------- Storico ---------- */
+    function leggiStorico() {
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+      } catch (e) {
+        return [];
+      }
+    }
+
+    function salvaInStorico(frase) {
+      var lista = leggiStorico();
+      lista = lista.filter(function(f) { return f !== frase; });
+      lista.unshift(frase);
+      lista = lista.slice(0, 20);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(lista));
+      renderStorico();
+    }
+
+    function renderStorico() {
+      var lista = leggiStorico();
+      var el = document.getElementById('storicoList');
+
+      if (lista.length === 0) {
+        el.innerHTML = '<div class="panel-empty">Le frasi che generi appariranno qui, cos\u00EC potrai richiamarle velocemente.</div>';
+        return;
+      }
+
+      el.innerHTML = '';
+      lista.forEach(function(frase) {
+        var item = document.createElement('div');
+        item.className = 'history-item';
+
+        var span = document.createElement('span');
+        span.className = 'history-text';
+        span.innerText = frase;
+
+        var actions = document.createElement('div');
+        actions.className = 'history-actions';
+
+        var btnUsa = document.createElement('button');
+        btnUsa.className = 'history-btn';
+        btnUsa.title = 'Riusa questa frase';
+        btnUsa.innerText = '↩️';
+        btnUsa.onclick = function() {
+          document.getElementById('inputFrase').value = frase;
+          mostraVista('home');
+          generaStriscia();
+        };
+
+        var btnRimuovi = document.createElement('button');
+        btnRimuovi.className = 'history-btn';
+        btnRimuovi.title = 'Rimuovi';
+        btnRimuovi.innerText = '🗑️';
+        btnRimuovi.onclick = function() {
+          var nuova = leggiStorico().filter(function(f) { return f !== frase; });
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(nuova));
+          renderStorico();
+        };
+
+        actions.appendChild(btnUsa);
+        actions.appendChild(btnRimuovi);
+        item.appendChild(span);
+        item.appendChild(actions);
+        el.appendChild(item);
+      });
+    }
+
+    /* ---------- Navigazione / Drawer ---------- */
+    var drawer = document.getElementById('drawer');
+    var overlay = document.getElementById('overlay');
+
+    function apriMenu() {
+      drawer.classList.add('open');
+      overlay.classList.add('open');
+    }
+    function chiudiMenu() {
+      drawer.classList.remove('open');
+      overlay.classList.remove('open');
+    }
+
+    document.getElementById('btnMenu').addEventListener('click', apriMenu);
+    document.getElementById('btnCloseDrawer').addEventListener('click', chiudiMenu);
+    overlay.addEventListener('click', chiudiMenu);
+
+    document.querySelectorAll('.nav-item[data-view]').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        mostraVista(btn.getAttribute('data-view'));
+        chiudiMenu();
+      });
+    });
+
+    function mostraVista(nome) {
+      document.querySelectorAll('.view-panel').forEach(function(panel) {
+        panel.classList.remove('active');
+      });
+      document.getElementById('view-' + nome).classList.add('active');
+
+      document.querySelectorAll('.nav-item[data-view]').forEach(function(btn) {
+        btn.classList.toggle('active', btn.getAttribute('data-view') === nome);
+      });
+
+      document.getElementById('viewTitle').innerText = VIEW_TITLES[nome] || '';
+
+      if (nome === 'storico') renderStorico();
+    }
+
+    renderStorico();
+  </script>
+</body>
+</html>
