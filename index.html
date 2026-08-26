@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Maestro Carmy AI</title>
+
+  <!-- PWA Manifest & Colori -->
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#315c9b">
+
+  <!-- iOS / Apple Safari -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Maestro Carmy">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <style>
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #eef3f8;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* Pulsante Menu Fluttuante in alto a destra */
+    .menu-btn-trigger {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      z-index: 9999;
+      background: #315c9b;
+      color: #ffffff;
+      border: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      cursor: pointer;
+      transition: transform 0.2s, background 0.2s;
+    }
+
+    .menu-btn-trigger:active {
+      transform: scale(0.92);
+      background: #244677;
+    }
+
+    /* Modali Overlay (Sfondo Sfumato) */
+    .pwa-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 99999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s ease, visibility 0.3s ease;
+    }
+
+    .pwa-overlay.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    /* Card Pop-up */
+    .pwa-card {
+      background: #ffffff;
+      border-radius: 24px;
+      padding: 24px;
+      max-width: 380px;
+      width: 100%;
+      max-height: 85vh;
+      overflow-y: auto;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+      transform: translateY(20px) scale(0.95);
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+    }
+
+    .pwa-overlay.visible .pwa-card {
+      transform: translateY(0) scale(1);
+    }
+
+    .pwa-icon {
+      width: 70px;
+      height: 70px;
+      border-radius: 18px;
+      margin: 0 auto 12px auto;
+      box-shadow: 0 6px 14px rgba(49, 92, 155, 0.2);
+      display: block;
+      object-fit: cover;
+    }
+
+    .pwa-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1e293b;
+      margin: 0 0 6px 0;
+    }
+
+    .pwa-desc {
+      font-size: 13px;
+      color: #64748b;
+      line-height: 1.4;
+      margin: 0 0 18px 0;
+    }
+
+    /* Lista link del menù */
+    .menu-links-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      text-align: left;
+      margin-bottom: 16px;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      color: #1e293b;
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background 0.2s, border-color 0.2s;
+      cursor: pointer;
+    }
+
+    .menu-item:hover, .menu-item:active {
+      background: #edf2f7;
+      border-color: #cbd5e1;
+    }
+
+    .menu-item-icon {
+      font-size: 18px;
+    }
+
+    /* Pulsanti Azione */
+    .pwa-actions {
+      display: flex;
+      gap: 8px;
+      flex-direction: column;
+    }
+
+    .btn-install {
+      background: #315c9b;
+      color: #ffffff;
+      border: none;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(49, 92, 155, 0.3);
+    }
+
+    .btn-close {
+      background: transparent;
+      color: #94a3b8;
+      border: none;
+      padding: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+
+    /* Testo per le Info e Istruzioni */
+    .info-content {
+      text-align: left;
+      font-size: 13px;
+      color: #334155;
+      line-height: 1.5;
+    }
+
+    .info-content h4 {
+      margin: 12px 0 4px 0;
+      color: #315c9b;
+    }
+  </style>
+  <!-- Google Analytics GA4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-2HQ9X4HHJ5"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-2HQ9X4HHJ5');
+
+    
+  </script>
+</head>
+<body>
+
+  <!-- Pulsante Menù Fisso -->
+  <button class="menu-btn-trigger" onclick="apriMenu()" title="Menù e Link">☰</button>
+
+  <!-- Web App Apps Script incorporata -->
+  <iframe src="https://script.google.com/macros/s/AKfycbwWKHzllmZh-AglGXdl7RFBtUrF-k_JtmqiHe3RaUeOkimcmjXUuaMtWsVf_6XgzGbIyw/exec" allow="clipboard-write"></iframe>
+
+  <!-- POP-UP 1: MODALE MENÙ / RISORSE -->
+  <div id="menuModal" class="pwa-overlay">
+    <div class="pwa-card">
+      <img src="icon-192.png" alt="Logo Maestro Carmy AI" class="pwa-icon">
+      <h3 class="pwa-title">Maestro Carmy AI</h3>
+      <p class="pwa-desc">Risorse didattiche, canali ufficiali e strumenti per la scuola.</p>
+      
+      <div class="menu-links-list">
+        <!-- 1. Info e Istruzioni (Apre il pop-up interno) -->
+        <div class="menu-item" onclick="apriInfo()">
+          <span class="menu-item-icon">ℹ️</span>
+          <span>Info e istruzioni</span>
+        </div>
+
+        <!-- 2. Pagina Facebook -->
+        <a href="https://www.facebook.com/profile.php?id=61592679823197" target="_blank" rel="noopener" class="menu-item">
+          <span class="menu-item-icon">📘</span>
+          <span>Pagina Facebook Maestro Carmelo</span>
+        </a>
+
+        <!-- 3. Canale Telegram -->
+        <a href="https://t.me/biancosulnero" target="_blank" rel="noopener" class="menu-item">
+          <span class="menu-item-icon">✈️</span>
+          <span>Canale Telegram</span>
+        </a>
+
+        <!-- 4. Blog Bianco Sul Nero -->
+        <a href="https://biancosulnero.blogspot.com/" target="_blank" rel="noopener" class="menu-item">
+          <span class="menu-item-icon">✍️</span>
+          <span>Blog: Bianco Sul Nero</span>
+        </a>
+
+        <!-- 5. Sito Guide Didattiche Gratis -->
+        <a href="https://www.guidedidattichegratis.it/" target="_blank" rel="noopener" class="menu-item">
+          <span class="menu-item-icon">📚</span>
+          <span>Sito: Guide didattiche gratis</span>
+        </a>
+      </div>
+
+      <div class="pwa-actions">
+        <button class="btn-install" id="btnInstallMenu" onclick="installaPWA()" style="display:none;">📱 Installa l'App</button>
+        <button class="btn-close" onclick="chiudiModale('menuModal')">Chiudi</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- POP-UP 2: MODALE INFO E ISTRUZIONI -->
+  <div id="infoModal" class="pwa-overlay">
+    <div class="pwa-card">
+      <h3 class="pwa-title">Info & Istruzioni</h3>
+      
+      <div class="info-content">
+        <h4>💡 Cos'è Maestro Carmy AI?</h4>
+        <p>
+          È un assistente didattico basato sull'Intelligenza Artificiale progettato per aiutare a generare schede didattiche in pochissimi clic.
+          Con Maestro Carmy AI è possibile creare in modo semplice e veloce schede didattiche personalizzate, scegliendo classe, disciplina e argomento.
+          Tra le funzioni disponibili c’è anche la possibilità di scegliere se creare le schede utilizzando il carattere maiuscolo o il minuscolo.
+          Le schede generate da Carmy AI non sono volutamente ricche di immagini, decorazioni o stimoli grafici. Una pagina eccessivamente ricca di elementi visivi può infatti attirare continuamente l’attenzione del bambino su aspetti secondari, rendendo più difficile concentrarsi sull’attività e sulle consegne.
+          © 2026 Maestro Carmelo Di Salvo | Bianco sul Nero. Tutti i diritti riservati.
+          </p>
+        
+      
+      </div>
+
+      <div class="pwa-actions" style="margin-top:16px;">
+        <button class="btn-install" onclick="tornaAlMenu()">⬅️ Torna al Menù</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let eventoInstallazione = null;
+    const menuModal = document.getElementById('menuModal');
+    const infoModal = document.getElementById('infoModal');
+    const btnInstallMenu = document.getElementById('btnInstallMenu');
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+    // 1. Registrazione Service Worker
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js')
+          .then(() => console.log('PWA Service Worker attivo'))
+          .catch(err => console.log('Errore SW:', err));
+      });
+    }
+
+    // 2. Intercetta evento di installazione
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      eventoInstallazione = e;
+      btnInstallMenu.style.display = 'block'; // Mostra il tasto di installazione nel menù
+      
+      // Apri automaticamente il menù la prima volta dopo 2 secondi
+      setTimeout(() => {
+        if (!sessionStorage.getItem('menuGiaMostrato')) {
+          apriMenu();
+        }
+      }, 2000);
+    });
+
+    if (isIOS && !window.navigator.standalone) {
+      btnInstallMenu.style.display = 'block';
+    }
+
+    // Funzioni di navigazione Modali
+    function apriMenu() {
+      menuModal.classList.add('visible');
+      sessionStorage.setItem('menuGiaMostrato', 'true');
+    }
+
+    function apriInfo() {
+      menuModal.classList.remove('visible');
+      infoModal.classList.add('visible');
+    }
+
+    function tornaAlMenu() {
+      infoModal.classList.remove('visible');
+      menuModal.classList.add('visible');
+    }
+
+    function chiudiModale(id) {
+      document.getElementById(id).classList.remove('visible');
+    }
+
+    function installaPWA() {
+      if (eventoInstallazione) {
+        eventoInstallazione.prompt();
+        eventoInstallazione.userChoice.then((scelta) => {
+          if (scelta.outcome === 'accepted') {
+            chiudiModale('menuModal');
+          }
+          eventoInstallazione = null;
+        });
+      } else if (isIOS) {
+        alert("Per installare l'app su iPhone/iPad:\n\n1. Tocca il tasto Condividi ⎋ in basso su Safari.\n2. Scorri e seleziona 'Aggiungi alla schermata Home'.");
+        chiudiModale('menuModal');
+      }
+    }
+    // Registra l'evento quando l'utente completa l'installazione
+    window.addEventListener('appinstalled', () => {
+      if (typeof gtag === 'function') {
+        gtag('event', 'pwa_install_success', {
+          'event_category': 'PWA',
+          'event_label': 'App Installata con successo'
+        });
+      }
+    });
+
+    // Registra quando l'app viene aperta dalla schermata Home
+    window.addEventListener('DOMContentLoaded', () => {
+      const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+      if (isStandalone && typeof gtag === 'function') {
+        gtag('event', 'pwa_open_standalone', {
+          'event_category': 'PWA',
+          'event_label': 'Apertura da Schermata Home'
+        });
+      }
+    });
+  </script>
+</body>
+</html>
