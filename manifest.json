@@ -1,23 +1,25 @@
 {
-  "name": "CAArmy – Dai forma alle tue parole",
+  "name": "CAArmy – Dai forma alle tue parole con la CAA",
   "short_name": "CAArmy",
-  "description": "Applicazione inclusiva in CAA con simboli ARASAAC",
+  "description": "Strumento didattico gratuito che trasforma le frasi in strisce di Comunicazione Aumentativa Alternativa (CAA).",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#1e3a8a",
   "orientation": "any",
+  "background_color": "#f4f6f9",
+  "theme_color": "#1e3a8a",
+  "lang": "it",
   "icons": [
     {
-      "src": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiDl4AReDkzCkfrZLAbXCbriZPBjN8_4gmCQOflmTfAsC80QU1RkCi2cRbKNhkgcRPmOXwYZd-lopuW1CjFMI2KAZcV4-EGtb3QGClrwGKAhM5p5PHhv2nYvuda-G-62KnipzZKwxymSipzi5GQniW3Q6cRtCyaQNrqG8xbB7fyeqPxbCoi6-PdfgDWjDNr/s320/avatar%20app%20caa.jpg",
+      "src": "icon-192.png",
       "sizes": "192x192",
-      "type": "image/jpeg",
+      "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiDl4AReDkzCkfrZLAbXCbriZPBjN8_4gmCQOflmTfAsC80QU1RkCi2cRbKNhkgcRPmOXwYZd-lopuW1CjFMI2KAZcV4-EGtb3QGClrwGKAhM5p5PHhv2nYvuda-G-62KnipzZKwxymSipzi5GQniW3Q6cRtCyaQNrqG8xbB7fyeqPxbCoi6-PdfgDWjDNr/s320/avatar%20app%20caa.jpg",
+      "src": "icon-512.png",
       "sizes": "512x512",
-      "type": "image/jpeg",
+      "type": "image/png",
       "purpose": "any maskable"
     }
   ]
