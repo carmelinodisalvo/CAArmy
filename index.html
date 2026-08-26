@@ -1320,9 +1320,9 @@
       }
 
       if (!API_URL || API_URL.indexOf('INSERISCI_QUI') !== -1) {
-        container.innerHTML = '<div class="strip-placeholder"><span>⚠️ Devi impostare l\'URL della Web App Apps Script nella variabile API_URL, in cima al file.</span></div>';
-        return;
-      }
+  container.innerHTML = '<div class="strip-placeholder"><span>⚠️ Devi impostare l\'URL della Web App Apps Script nella variabile API_URL, in cima al file.</span></div>';
+  return;
+}
 
       salvaInStorico(testo);
 
